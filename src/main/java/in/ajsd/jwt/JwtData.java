@@ -154,6 +154,26 @@ public class JwtData {
     return claims;
   }
 
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof JwtData)) {
+      return false;
+    }
+    JwtData that = (JwtData) other;
+    if (this == that) {
+      return true;
+    }
+    return equal(getType(), that.getType())
+        && equal(getAlgorithm(), that.getAlgorithm())
+        && equal(getIssuer(), that.getIssuer())
+        && equal(getSubject(), that.getSubject())
+        && equal(getAudience(), that.getAudience())
+        && equal(getExpires(), that.getExpires())
+        && equal(getNotBefore(), that.getNotBefore())
+        && equal(getIssuedAt(), that.getIssuedAt())
+        && equal(getJwtId(), that.getJwtId());
+  }
+
   public static Builder newBuilder() {
     return new Builder();
   }
@@ -225,5 +245,28 @@ public class JwtData {
       return  null;
     }
     return value;
+  }
+
+  private static boolean equal(String s1, String s2) {
+    return (s1 == s2) || (s1 != null && s2 != null && s1.equals(s2));
+  }
+
+  private static boolean equal(Long l1, Long l2) {
+    return (l1 == l2) || (l1 != null && l2 != null && Long.compareUnsigned(l1, l2) == 0);
+  }
+
+  private static boolean equal(List<String> l1, List<String> l2) {
+    if (l1 == l2) {
+      return true;
+    }
+    if (l1.size() != l2.size()) {
+      return false;
+    }
+    for (int i = 0; i < l1.size(); i++) {
+      if (!equal(l1.get(i), l2.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 }
