@@ -5,9 +5,16 @@ import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * JWT header and claims data.
+ *
+ * <p>TODO: add support for custom claims.
+ * @author Arunjit Singh <opensrc@ajsd.in>
+ */
 public class JwtData {
 
-  private static class Header {
+  /** JWT header. Defaults to HS256. */
+  static class Header {
     // "typ" Type
     private String typ = "JWT";
 
@@ -15,7 +22,8 @@ public class JwtData {
     private String alg = Algorithm.HS256.getJwtName();
   }
 
-  private static class Claims {
+  /** JWT claims set. */
+  static class Claims {
     // 4.1.1.  "iss" (Issuer) Claim
     // The iss (issuer) claim identifies the principal that issued the JWT.
     // The processing of this claim is generally application specific. The iss
@@ -45,13 +53,13 @@ public class JwtData {
     // StringOrURI value. The interpretation of audience values is generally
     // application specific.
     // Use of this claim is OPTIONAL.
-    private List<String> aud = null;
-    // TODO(arunjit): "aud" can be a list or string. Use:
+    // TODO: "aud" can be a list or string. Use:
     // Object aud = null;
     // public String getAudience() {...}
     // public List<String> getAudienceAsList() {...}
     // public Builder setAudience(String value) {...}  // converts to String
     // public Builder addAudience(String value) {...}  // converts to List<String>
+    private List<String> aud = null;
 
     // 4.1.4.  "exp" (Expiration Time) Claim
     // The exp (expiration time) claim identifies the expiration time on or after
@@ -90,8 +98,25 @@ public class JwtData {
     private Long jti = null;
   }
 
-  private final Header header = new Header();
-  private final Claims claims = new Claims();
+  private final Header header;
+  private final Claims claims;
+
+  private JwtData() {
+    this(null, null);
+  }
+
+  private JwtData(Header header) {
+    this(header, null);
+  }
+
+  private JwtData(Claims claims) {
+    this(null, claims);
+  }
+
+  private JwtData(Header header, Claims claims) {
+    this.header = header != null ? header : new Header();
+    this.claims = claims != null ? claims : new Claims();
+  }
 
   public String getType() {
     return header.typ;
@@ -121,12 +146,33 @@ public class JwtData {
     return claims.jti;
   }
 
+  public Header getHeader() {
+    return header;
+  }
+
+  public Claims getClaims() {
+    return claims;
+  }
+
   public static Builder newBuilder() {
     return new Builder();
   }
 
+  public static JwtData of(Header header, Claims claims) {
+    return new JwtData(header, claims);
+  }
+
   public static class Builder {
     private JwtData jwt = new JwtData();
+
+    public Builder withHeader(Header header) {
+      jwt = new JwtData(header, jwt.claims);
+      return this;
+    }
+    public Builder withClaims(Claims claims) {
+      jwt = new JwtData(jwt.header, claims);
+      return this;
+    }
     public Builder setIssuer(String value) {
       jwt.claims.iss = fix(value);
       return this;

@@ -1,5 +1,6 @@
 package in.ajsd.jwt;
 
+/** JWT token signing algorithms. Only HS256 is supported for now. */
 public enum Algorithm {
   HS256("HS256", "HmacSHA256"),
   ;
