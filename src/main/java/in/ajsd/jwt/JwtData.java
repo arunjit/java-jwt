@@ -1,5 +1,6 @@
 package in.ajsd.jwt;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 import java.util.ArrayList;
@@ -172,6 +173,19 @@ public class JwtData {
         && equal(getNotBefore(), that.getNotBefore())
         && equal(getIssuedAt(), that.getIssuedAt())
         && equal(getJwtId(), that.getJwtId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getType(),
+        getAlgorithm(),
+        getIssuer(),
+        getSubject(),
+        getAudience(),
+        getExpires(),
+        getNotBefore(),
+        getIssuedAt(),
+        getJwtId());
   }
 
   public static Builder newBuilder() {
