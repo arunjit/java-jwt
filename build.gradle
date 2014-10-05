@@ -51,3 +51,20 @@ dependencies {
   testCompile 'com.google.truth:truth:0.+'
   testCompile 'junit:junit:4.+'
 }
+
+// Publishing
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+group = 'in.ajsd'
+version = '1.0-pre'
+
+publishing {
+  publications {
+    jwt(MavenPublication) {
+      artifactId 'java-jwt'
+
+      from components.java
+    }
+  }
+}
