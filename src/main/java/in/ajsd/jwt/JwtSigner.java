@@ -1,7 +1,5 @@
 package in.ajsd.jwt;
 
-import org.apache.commons.codec.binary.Base64;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -14,7 +12,7 @@ public class JwtSigner {
   private final Algorithm algorithm;
 
   public JwtSigner(String urlSafeBase64Secret, Algorithm algorithm) {
-    this(Base64.decodeBase64(urlSafeBase64Secret), algorithm);
+    this(Util.base64Decode(urlSafeBase64Secret), algorithm);
   }
 
   public JwtSigner(byte[] secret, Algorithm algorithm) {
@@ -22,11 +20,22 @@ public class JwtSigner {
     this.key = new SecretKeySpec(secret, algorithm.getName());
   }
 
-  public String sign() throws JwtException {
+  public String sign(JwtData jwt) throws JwtException {
     try {
       Mac hmac = Mac.getInstance(algorithm.getName());
       hmac.init(key);
-      return "";
+      String header = Util.base64Encode(Util.GSON.toJson(jwt.getHeader()));
+      String payload = Util.base64Encode(Util.GSON.toJson(jwt.getClaims()));
+      byte[] sig = hmac.doFinal(new StringBuilder(header)
+          .append(".")
+          .append(payload)
+          .toString().getBytes());
+      String signature = Util.base64Encode(sig);
+      return new StringBuilder(header)
+          .append(".")
+          .append(payload)
+          .append(".")
+          .append(signature).toString();
     } catch (NoSuchAlgorithmException | InvalidKeyException e) {
       throw new JwtException(e);
     }
