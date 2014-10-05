@@ -1,5 +1,7 @@
 package in.ajsd.jwt;
 
+import org.joda.time.DateTime;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -31,6 +33,10 @@ public class JwtVerifier {
     verifySignature(Util.join(parts.get(0), parts.get(1)), parts.get(2),
         Algorithm.fromJwt(jwt.getAlgorithm()));
 
+    long now = DateTime.now().getMillis();
+    verifyExpires(jwt.getExpires(), now);
+    verifyNotBefore(jwt.getNotBefore(), now);
+
     return jwt;
   }
 
@@ -47,6 +53,18 @@ public class JwtVerifier {
     }
     if (!Arrays.equals(toVerify, Util.base64Decode(signature))) {
       throw new JwtException("Signatures do not match");
+    }
+  }
+
+  public void verifyExpires(Long expires, long now) throws JwtException {
+    if (expires != null && now < expires) {  // TODO: threshold
+      throw new JwtException("Token has expired");
+    }
+  }
+
+  public void verifyNotBefore(Long notBefore, long now) throws JwtException {
+    if (notBefore != null && now > notBefore) {
+      throw new JwtException("Token isn't valid yet");
     }
   }
 
