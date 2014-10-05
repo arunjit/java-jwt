@@ -96,7 +96,7 @@ public class JwtData {
     // to a different data object. The jti claim can be used to prevent the JWT
     // from being replayed. The jti value is a case-sensitive string.
     // Use of this claim is OPTIONAL.
-    private Long jti = null;
+    private String jti = null;
   }
 
   private final Header header;
@@ -143,7 +143,7 @@ public class JwtData {
   public Long getIssuedAt() {
     return claims.iat;
   }
-  public Long getJwtId() {
+  public String getJwtId() {
     return claims.jti;
   }
 
@@ -241,7 +241,7 @@ public class JwtData {
       jwt.claims.iat = fix(value);
       return this;
     }
-    public Builder setJwtId(Long value) {
+    public Builder setJwtId(String value) {
       jwt.claims.jti = fix(value);
       return this;
     }

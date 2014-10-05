@@ -10,7 +10,6 @@ import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-
 /** A verifier to verify JWT tokens. */
 public class JwtVerifier {
 
@@ -36,6 +35,7 @@ public class JwtVerifier {
     long now = DateTime.now().getMillis();
     verifyExpires(jwt.getExpires(), now);
     verifyNotBefore(jwt.getNotBefore(), now);
+    // TODO: Add verification for aud,iat,jti
 
     return jwt;
   }
