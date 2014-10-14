@@ -18,8 +18,8 @@ public class JwtTest {
 
   @Test
   public void signedShouldVerify() throws Exception {
-    String token = JwtSigner.createToken(SECRET, JWT);
-    JwtData jwt = JwtVerifier.verifyToken(SECRET, token);
+    String token = Jwt.sign(SECRET, JWT);
+    JwtData jwt = Jwt.verify(SECRET, token);
     assertThat(jwt).isEqualTo(JWT);
   }
 }

@@ -9,7 +9,13 @@ import com.google.gson.LongSerializationPolicy;
 
 import org.apache.commons.codec.binary.Base64;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 class Util {
 
@@ -45,5 +51,35 @@ class Util {
 
   static String join(String... parts) {
     return JWT_TOKEN_JOINER.join(parts);
+  }
+
+  static JwtData createJwtData(String headerBase64, String claimsBase64) {
+    String headerJson = new String(base64Decode(headerBase64));
+    String claimsJson = new String(base64Decode(claimsBase64));
+    JwtData.Header header = GSON.fromJson(headerJson, JwtData.Header.class);
+    JwtData.Claims claims = GSON.fromJson(claimsJson, JwtData.Claims.class);
+    return JwtData.of(header, claims);
+  }
+
+  static String toJson(JwtData jwt) {
+    return Util.join(
+        Util.base64Encode(Util.GSON.toJson(jwt.getHeader())),
+        Util.base64Encode(Util.GSON.toJson(jwt.getClaims())));
+  }
+
+  static void verifyHmac(byte[] secret, String algorithm, String unsigned, String signature)
+      throws JwtException {
+    byte[] toVerify = {};
+    try {
+      SecretKeySpec key = new SecretKeySpec(secret, algorithm);
+      Mac hmac = Mac.getInstance(algorithm);
+      hmac.init(key);
+      toVerify = hmac.doFinal(unsigned.getBytes());
+    } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+      throw new JwtException(e);
+    }
+    if (!Arrays.equals(toVerify, Util.base64Decode(signature))) {
+      throw new JwtException("Signatures do not match");
+    }
   }
 }

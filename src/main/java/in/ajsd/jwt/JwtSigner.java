@@ -26,24 +26,11 @@ public class JwtSigner {
     try {
       Mac hmac = Mac.getInstance(algorithm.getName());
       hmac.init(key);
-      String unsigned = Util.join(
-          Util.base64Encode(Util.GSON.toJson(jwt.getHeader())),
-          Util.base64Encode(Util.GSON.toJson(jwt.getClaims())));
-
+      String unsigned = Util.toJson(jwt);
       String signature = Util.base64Encode(hmac.doFinal(unsigned.getBytes()));
       return Util.join(unsigned, signature);
     } catch (NoSuchAlgorithmException | InvalidKeyException e) {
       throw new JwtException(e);
     }
-  }
-
-  public static String createToken(byte[] secret, JwtData jwt) throws JwtException {
-    JwtSigner signer = new JwtSigner(secret, Algorithm.fromJwt(jwt.getAlgorithm()));
-    return signer.sign(jwt);
-  }
-
-  public static String createToken(String urlSafeBase64Secret, JwtData jwt)
-      throws JwtException {
-    return createToken(Util.base64Decode(urlSafeBase64Secret), jwt);
   }
 }

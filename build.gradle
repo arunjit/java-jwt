@@ -57,7 +57,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 group = 'in.ajsd'
-version = '1.0-pre'
+version = '1.0-RC1'
 
 publishing {
   publications {
